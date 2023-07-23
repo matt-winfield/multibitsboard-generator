@@ -68,11 +68,15 @@ export const Board = () => {
 
         let newValues: number[] = []
         for (let squareIndex = 63; squareIndex >= 0; squareIndex--) {
-            const binary = bigInts.map(long => ((long >> BigInt(squareIndex)) & 1n) !== 0n ? '1' : '0').join('')
-            newValues[squareIndex] = parseInt(binary, 2)
+            newValues[squareIndex] = getValueFromLongs(bigInts, squareIndex)
         }
         setValues(newValues);
         updateMaxValue(newValues);
+    }
+
+    const getValueFromLongs = (longs: bigint[], squareIndex: number) => {
+        const binary = longs.map(long => ((long >> BigInt(squareIndex)) & 1n) !== 0n ? '1' : '0').join('')
+        return parseInt(binary, 2)
     }
 
     return <div className='flex'>
