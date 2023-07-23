@@ -8,6 +8,7 @@ export const Board = () => {
     const [values, setValues] = useState<number[]>([])
     const [result, setResult] = useState('')
     const [maxValue, setMaxValue] = useState(0)
+    const [inputValue, setInputValue] = useState('')
 
     for (let rank = 7; rank >= 0; rank--) {
         for (let file = 0; file < 8; file++) {
@@ -15,14 +16,17 @@ export const Board = () => {
         }
     }
 
-    const generate = (newValues: number[]) => {
+    const updateMaxValue = (values: number[]) => {
         let maxValue = 0;
         for (let i = 0; i < 64; i++) {
-            if (newValues[i] > maxValue) {
-                maxValue = newValues[i]
+            if (values[i] > maxValue) {
+                maxValue = values[i]
             }
         }
+        setMaxValue(maxValue)
+    }
 
+    const generate = (newValues: number[]) => {
         const numBits = Math.ceil(Math.log2(maxValue + 1))
         let longs: bigint[] = []
 
@@ -45,7 +49,7 @@ export const Board = () => {
         }
 
         setResult(longs.map(long => `0x${long.toString(16)}`).join(', '))
-        setMaxValue(maxValue)
+        updateMaxValue(newValues);
     }
 
     const updateValues = (event: ChangeEvent<HTMLInputElement>, squareIndex: number) => {
@@ -53,6 +57,22 @@ export const Board = () => {
         newValues[squareIndex] = parseInt(event.target.value)
         setValues(newValues)
         generate(newValues);
+        setInputValue('')
+    }
+
+    const parseValuesFromString = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setInputValue(value);
+        const splitValues = value.split(',').map(value => value.trim())
+        var bigInts = splitValues.map(value => BigInt(value))
+
+        let newValues: number[] = []
+        for (let squareIndex = 63; squareIndex >= 0; squareIndex--) {
+            const binary = bigInts.map(long => ((long >> BigInt(squareIndex)) & 1n) !== 0n ? '1' : '0').join('')
+            newValues[squareIndex] = parseInt(binary, 2)
+        }
+        setValues(newValues);
+        updateMaxValue(newValues);
     }
 
     return <div className='flex'>
@@ -74,6 +94,7 @@ export const Board = () => {
             <div>This is a tool for generating MultiBitsBoards, which are used to store N bits of data in each square of a chessboard, using N longs.</div>
             <div>They aren&apos;t very useful in normal chess programming - Compared to a normal array of data they are more computationally expensive to read, and harder to work with. However for https://github.com/SebLague/Chess-Challenge where we need to hardcode this data with as few tokens as possible, it can be useful.</div>
             <div className='mt-5 font-mono'>Result: {result}</div>
+            <input className='mt-5 bg-white text-black font-mono w-full' value={inputValue} onChange={parseValuesFromString}></input>
         </div>
     </div >
 
