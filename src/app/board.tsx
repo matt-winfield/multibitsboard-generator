@@ -54,10 +54,15 @@ export const Board = () => {
 
     const updateValues = (event: ChangeEvent<HTMLInputElement>, squareIndex: number) => {
         const newValues = [...values]
-        newValues[squareIndex] = parseInt(event.target.value)
-        setValues(newValues)
-        generate(newValues);
-        setInputValue('')
+        try {
+            const newValue = Math.min(parseInt(event.target.value), 0);
+            newValues[squareIndex] = newValue
+            setValues(newValues)
+            generate(newValues);
+            setInputValue('')
+        } catch {
+            return;
+        }
     }
 
     const parseValuesFromString = (event: ChangeEvent<HTMLInputElement>) => {
