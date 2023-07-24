@@ -55,7 +55,7 @@ export const Board = () => {
     const updateValues = (event: ChangeEvent<HTMLInputElement>, squareIndex: number) => {
         const newValues = [...values]
         try {
-            const newValue = Math.min(parseInt(event.target.value), 0);
+            const newValue = Math.max(parseInt(event.target.value), 0);
             newValues[squareIndex] = newValue
             setValues(newValues)
             generate(newValues);
